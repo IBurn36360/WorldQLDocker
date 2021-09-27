@@ -1,2 +1,4 @@
 # WorldQLDocker
-Dockerfile and scripts for WorldQL
+**FOR DEVELOPMENT PURPOSES ONLY**
+
+Dockerfile and scripts for WorldQL.
