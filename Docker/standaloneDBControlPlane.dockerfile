@@ -28,6 +28,5 @@ ENV WQL_NUM_LEVELS=2
 ENV WQL_ROOTS_PER_TABLE=8
 ENV WQL_POSTGRES_CONNECTION_STRING="postgresql://docker:docker@localhost?port=5433&dbname=docker"
 
-ADD wrapper.sh ./wrapper.sh
+ADD Standalone/wrapper.sh ./wrapper.sh
 CMD ["./wrapper.sh"]
-

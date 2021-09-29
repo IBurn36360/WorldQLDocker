@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   client-minecraft-server:
-    container_name: worldql-client
+    container_name: worldql-client-server-node
     build:
       dockerfile: Docker/mammothClientServer.dockerfile
       context: .
@@ -14,9 +14,13 @@ services:
     depends_on:
       - control-plane
       - postgres-db
+    ports:
+      - "25565:25565"
+    networks:
+      worldql:
 
   control-plane:
-    container_name: worldql-mammoth
+    container_name: worldql-mammoth-control-plane
     build:
       dockerfile: Docker/mammothControlPlane.dockerfile
       context: .
@@ -26,6 +30,8 @@ services:
       - postgres-db
     depends_on:
       - postgres-db
+    networks:
+      worldql:
 
   postgres-db:
     image: postgres:13-alpine
@@ -34,6 +40,8 @@ services:
       POSTGRES_PASSWORD: "docker"
       POSTGRES_DB: "docker"
     restart: always
+    networks:
+      worldql:
 
 # Uncomment this section to expose an adminer GUI to have a tool available for exploring the database
   debug-adminer:
@@ -43,3 +51,12 @@ services:
       - "8080:8080"
     environment:
       ADMINER_DEFAULT_SERVER: "postgres-db"
+    links:
+      - postgres-db
+    depends_on:
+      - postgres-db
+    networks:
+      worldql:
+
+networks:
+  worldql:
