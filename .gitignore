@@ -1,2 +1,5 @@
 .idea
 .vscode
+
+# We are ignoring this specifically because devs should be able to run the manual stack deployment(s) without accidentally committing a dev release of the plugin
+Docker/ClientServer/WorldQLClient.jar

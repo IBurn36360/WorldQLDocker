@@ -28,8 +28,8 @@ RUN mkdir -pv ./plugins
 
 WORKDIR /srv/minecraft/plugins
 
-# Fetch the current WorldQL Distro
-RUN wget https://github.com/WorldQL/mammoth/releases/download/v0.02-alpha/WorldQLClient-1.0-SNAPSHOT.jar
+# Fetch the manual distro
+COPY ./Docker/ClientServer/WorldQLClient.jar WorldQLClient.jar
 
 # Make sure we copy in a valid initial config pointing to our Mammoth control plane
 RUN mkdir -pv /srv/minecraft/plugins/WorldQLClient

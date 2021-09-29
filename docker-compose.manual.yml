@@ -4,7 +4,7 @@ services:
   client-minecraft-server:
     container_name: worldql-client-server-node
     build:
-      dockerfile: Docker/mammothClientServer.dockerfile
+      dockerfile: Docker/mammothClientServer_Manual.dockerfile
       context: .
     links:
       - control-plane
