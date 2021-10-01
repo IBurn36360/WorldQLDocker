@@ -1,5 +1,0 @@
-# WorldQL Connection Details
-worldql:
-  host: 'control-plane'
-  push-port: 5555
-  handshake-port: 5556
