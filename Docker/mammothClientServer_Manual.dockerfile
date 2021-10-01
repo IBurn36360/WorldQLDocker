@@ -1,13 +1,7 @@
 FROM openjdk:16.0.2-slim
 
 LABEL Maintainer="The WorldQL Team"
-LABEL Description="A plain client server image for Mammoth"
-
-# Set up WorldQL's base values
-ENV WQL_LEAF_SQUARE_SIZE=16
-ENV WQL_TREE_DEGREE=512
-ENV WQL_NUM_LEVELS=2
-ENV WQL_ROOTS_PER_TABLE=8
+LABEL Description="A plain client sever image for Mammoth, using the locally built version of the plugin"
 
 # Set up the base Java values
 ENV JAVA_MEMORY_MIN="128M"
@@ -31,9 +25,14 @@ WORKDIR /srv/minecraft/plugins
 # Fetch the manual distro
 COPY ./Docker/ClientServer/WorldQLClient.jar WorldQLClient.jar
 
-# Make sure we copy in a valid initial config pointing to our Mammoth control plane
+# Copy in our config generating script and execute it
 RUN mkdir -pv /srv/minecraft/plugins/WorldQLClient
-COPY ./Docker/ClientServer/WorldQLConfig.yml /srv/minecraft/plugins/WorldQLClient/config.yml
+
+WORKDIR /srv/minecraft/plugins/WorldQLClient
+
+COPY ./Docker/ClientServer/resolveArgumentsAndPrepConfig.sh resolveArgumentsAndPrepConfig.sh
+
+RUN chmod +x resolveArgumentsAndPrepConfig.sh
 
 WORKDIR /srv/minecraft
 
@@ -41,5 +40,5 @@ WORKDIR /srv/minecraft
 EXPOSE 25565
 
 # Alright, now that we have everything done, the start command is to just run the server
-CMD java -Xms${JAVA_MEMORY_MIN} -Xmx${JAVA_MEMORY_MAX} ${JAVA_ARGS} -jar paper.jar nogui
-# CMD sh
+CMD /srv/minecraft/plugins/WorldQLClient/resolveArgumentsAndPrepConfig.sh && java -Xms${JAVA_MEMORY_MIN} -Xmx${JAVA_MEMORY_MAX} ${JAVA_ARGS} -jar paper.jar nogui
+

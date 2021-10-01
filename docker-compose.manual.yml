@@ -2,10 +2,15 @@ version: "3.8"
 
 services:
   client-minecraft-server:
-    container_name: worldql-client-server-node
+    container_name: worldql-client-server-node-manual
     build:
       dockerfile: Docker/mammothClientServer_Manual.dockerfile
       context: .
+    environment:
+      WQL_CONTROL_PLANE_HOST: "control-plane"
+      WQL_CONTROL_PLANE_HANDSHAKE_PORT: "5554"
+      WQL_CONTROL_PLANE_PUSH_PORT: "5555"
+      WQL_SELF_IDENT_HOST: "docker"
     links:
       - control-plane
     depends_on:
@@ -21,7 +26,10 @@ services:
       dockerfile: Docker/mammothControlPlane.dockerfile
       context: .
     environment:
-      WQL_POSTGRES_CONNECTION_STRING: "postgresql://docker:docker@postgres-db?port=5432&dbname=docker"
+      WQL_USER: ${WQL_USER}
+      WQL_PASSWORD: ${WQL_PASSWORD}
+      WQL_DB: ${WQL_DATABASE}
+      WQL_HOST: "postgres-db" # Resolves to the postgres DB's internal IP
     links:
       - postgres-db
     depends_on:
@@ -32,9 +40,9 @@ services:
   postgres-db:
     image: postgres:13-alpine
     environment:
-      POSTGRES_USER: "docker"
-      POSTGRES_PASSWORD: "docker"
-      POSTGRES_DB: "docker"
+      POSTGRES_USER: ${WQL_USER}
+      POSTGRES_PASSWORD: ${WQL_PASSWORD}
+      POSTGRES_DB: ${WQL_DATABASE}
     restart: always
     networks:
       worldql:

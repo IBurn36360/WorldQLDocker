@@ -18,20 +18,28 @@ FROM alpine
 LABEL Maintainer="The WorldQL Team"
 LABEL Description="The main control plane image for Mammoth"
 
+# Set the DB env vars
 ENV WQL_LEAF_SQUARE_SIZE=16
 ENV WQL_TREE_DEGREE=512
 ENV WQL_NUM_LEVELS=2
 ENV WQL_ROOTS_PER_TABLE=8
 
+# Set our default values for some environment variables
+ENV WQL_PORT=5432
+
 RUN apk update
 RUN apk upgrade
-RUN apk --no-cache add supervisor libzmq libpq libc6-compat
+RUN apk --no-cache add libzmq libpq libc6-compat
 
-COPY "./Docker/ControlPlane/supervisord.conf" /etc/supervisor/conf.d/supervisord.conf
-
+# Fetch Mammoth's control plane binary from the release
 RUN mkdir -pv /srv/mammoth-server/
 RUN wget -O /srv/mammoth-server/WorldQLServer https://github.com/WorldQL/mammoth/releases/download/v0.01-alpha/WorldQLServer
 RUN chmod +x /srv/mammoth-server/WorldQLServer
+
+# Copy in our DSN building script, as it needs to be an environment variable for the binary
+COPY ./Docker/ControlPlane/resolveEnvironmentAndRunControlPlane.sh /srv/mammoth-server/resolveEnvironmentAndRunControlPlane.sh
+RUN chmod +x /srv/mammoth-server/resolveEnvironmentAndRunControlPlane.sh
+
 RUN chown -Rv nobody.nobody /srv/mammoth-server
 
 # We need to alter the run directory permissions for Supervisor
@@ -46,4 +54,5 @@ USER nobody
 EXPOSE 5555
 EXPOSE 5556
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# We don't need to run anything fancy here, so in preparation for a barebones image, just terminate the container if the process dies
+CMD /srv/mammoth-server/resolveEnvironmentAndRunControlPlane.sh
