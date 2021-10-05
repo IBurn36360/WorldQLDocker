@@ -8,7 +8,7 @@ services:
       context: .
     environment:
       WQL_CONTROL_PLANE_HOST: "control-plane"
-      WQL_CONTROL_PLANE_HANDSHAKE_PORT: "5554"
+      WQL_CONTROL_PLANE_HANDSHAKE_PORT: "5556"
       WQL_CONTROL_PLANE_PUSH_PORT: "5555"
       WQL_SELF_IDENT_HOST: "docker"
     links:

@@ -1,0 +1,120 @@
+# The image in this file is a locally tagged file by default.  If you wish to use this in production,
+# you MUST change that to a real, available, image name
+
+# Client Servers Persistent Volumes
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mammoth-client-server-plugins
+  namespace: mammoth-deployment-client-scaling
+spec:
+  accessModes:
+    -   ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+---
+
+# Client Servers Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mammoth-client-servers
+  namespace: mammoth-deployment-client-scaling
+  labels:
+    name: mammoth-deployment-client-servers
+spec:
+  selector:
+    name: mammoth-client-servers
+    namespace: mammoth-deployment-client-scaling
+    type: client-server-deployment
+  ports:
+    -   name: mammoth-client-server-tcp
+        protocol: TCP
+        port: 25565
+    -   name: mammoth-client-server-udp
+        protocol: UDP
+        port: 25565
+  type: NodePort
+---
+
+# Client Server HPA
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mammoth-client-server-autoscaler
+  namespace: mammoth-deployment-client-scaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mammoth-client-server
+  minReplicas: 1
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+---
+
+# Client Server Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mammoth-client-server
+  namespace: mammoth-deployment-client-scaling
+  labels:
+    name: mammoth-client-servers
+    namespace: mammoth-deployment-client-scaling
+    type: client-server-deployment
+spec:
+  selector:
+    matchLabels:
+      name: mammoth-client-servers
+      namespace: mammoth-deployment-client-scaling
+      type: client-server-deployment
+  template:
+    metadata:
+      namespace: mammoth-deployment-client-scaling
+      labels:
+        name: mammoth-client-servers
+        namespace: mammoth-deployment-client-scaling
+        type: client-server-deployment
+    spec:
+      containers:
+        -   name: mammoth-client-server
+            image: worldql-client-server:local
+            imagePullPolicy: Never
+            env:
+            - name: WQL_KUBE_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: WQL_KUBE_POD_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: WQL_KUBE_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            envFrom:
+              - configMapRef:
+                  name: mammoth-client-server-environment
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1024M
+              requests:
+                cpu: 1000m
+                memory: 512M
+            volumeMounts:
+              -   mountPath: /srv/minecraft/plugins
+                  name: client-server-plugins
+      volumes:
+        -   name: client-server-plugins
+            persistentVolumeClaim:
+              claimName: mammoth-client-server-plugins
+---

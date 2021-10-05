@@ -1,0 +1,38 @@
+# Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mammoth-deployment-client-scaling
+---
+
+# Secrets
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgsql-connection-info
+  namespace: mammoth-deployment-client-scaling
+type: Opaque
+data:
+  # These are going to be set either by a tool or CLI later, but we need to be able to reference them in other files
+  pgsql-user: ""
+  pgsql-pass: ""
+  pgsql-db: ""
+---
+
+# General Config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mammoth-client-server-environment
+  namespace: mammoth-deployment-client-scaling
+data:
+  WQL_PGSQL_HOST: "mammoth-database.mammoth-deployment-client-scaling.svc.cluster.local"
+  WQL_CONTROL_PLANE_HOST: "mammoth-control-plane.mammoth-deployment-client-scaling.svc.cluster.local"
+  WQL_CLIENT_SERVERS_HOST: "mammoth-client-servers.mammoth-deployment-client-scaling.svc.cluster.local"
+  WQL_CONTROL_PLANE_HANDSHAKE_PORT: "5556"
+  WQL_CONTROL_PLANE_PUSH_PORT: "5555"
+  WQL_SELF_IDENT_HOST: "__RESOLVE::WQL_KUBE_POD_IP"
+---

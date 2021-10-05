@@ -1,0 +1,78 @@
+# The image in this file is a locally tagged file by default.  If you wish to use this in production,
+# you MUST change that to a real, available, image name
+
+# Control Plane
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mammoth-cp
+  namespace: mammoth-deployment-client-scaling
+  labels:
+    name: mammoth-cp
+    namespace: mammoth-deployment-client-scaling
+    type: cp
+spec:
+  containers:
+    - name: mammoth-cp
+      image: worldql-control-plane:local
+      imagePullPolicy: Never
+      envFrom:
+        - configMapRef:
+            name: mammoth-client-server-environment
+      env:
+        - name: WQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-user
+        - name: WQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-pass
+        - name: WQL_DB
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-db
+        - name: WQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mammoth-client-server-environment
+              key: WQL_PGSQL_HOST
+        - name: WQL_KUBE_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: WQL_KUBE_POD_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: WQL_KUBE_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+---
+
+# Control Plane Service (Required for hostname resolution)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mammoth-control-plane
+  namespace: mammoth-deployment-client-scaling
+spec:
+  selector:
+    name: mammoth-cp
+    namespace: mammoth-deployment-client-scaling
+    type: cp
+  ports:
+    - name: handshake-port
+      protocol: TCP
+      port: 5556
+    - name: push-port
+      protocol: TCP
+      port: 5555
+  type: NodePort
+---

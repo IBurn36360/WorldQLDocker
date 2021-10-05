@@ -20,19 +20,16 @@ RUN wget -O paper.jar "https://papermc.io/api/v2/projects/paper/versions/1.17.1/
 RUN echo "eula=true" > eula.txt
 RUN mkdir -pv ./plugins
 
-WORKDIR /srv/minecraft/plugins
-
-# Fetch the manual distro
-COPY ./Docker/ClientServer/WorldQLClient.jar WorldQLClient.jar
-
 # Copy in our config generating script and execute it
 RUN mkdir -pv /srv/minecraft/plugins/WorldQLClient
+RUN mkdir -pv /srv/mammoth/
+RUN touch /srv/mammoth/config.yml
 
-WORKDIR /srv/minecraft/plugins/WorldQLClient
+# Fetch the manual distro and the config/prep script
+COPY ./Docker/ClientServer/WorldQLClient.jar /srv/mammoth/WorldQLClient.jar
+COPY ./Docker/ClientServer/resolveArgumentsAndPrepConfig.sh /srv/mammoth/resolveArgumentsAndPrepConfig.sh
 
-COPY ./Docker/ClientServer/resolveArgumentsAndPrepConfig.sh resolveArgumentsAndPrepConfig.sh
-
-RUN chmod +x resolveArgumentsAndPrepConfig.sh
+RUN chmod +x /srv/mammoth/resolveArgumentsAndPrepConfig.sh
 
 WORKDIR /srv/minecraft
 
@@ -40,5 +37,5 @@ WORKDIR /srv/minecraft
 EXPOSE 25565
 
 # Alright, now that we have everything done, the start command is to just run the server
-CMD /srv/minecraft/plugins/WorldQLClient/resolveArgumentsAndPrepConfig.sh && java -Xms${JAVA_MEMORY_MIN} -Xmx${JAVA_MEMORY_MAX} ${JAVA_ARGS} -jar paper.jar nogui
+CMD /srv/mammoth/resolveArgumentsAndPrepConfig.sh && java -Xms${JAVA_MEMORY_MIN} -Xmx${JAVA_MEMORY_MAX} ${JAVA_ARGS} -jar paper.jar nogui
 

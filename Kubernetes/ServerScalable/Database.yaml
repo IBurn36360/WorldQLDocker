@@ -1,0 +1,92 @@
+# Database PV Claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mammoth-database
+  namespace: mammoth-deployment-client-scaling
+spec:
+  accessModes:
+    -   ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+---
+
+# Database Service (Required for hostname resolution)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mammoth-database
+  namespace: mammoth-deployment-client-scaling
+spec:
+  selector:
+    name: mammoth-db
+    namespace: mammoth-deployment-client-scaling
+    type: db-deployment
+  ports:
+    - name: pg-port
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: NodePort
+  # Comment this out if you want to be able to access the DB from outside of the cluster while it is running (Not recommended)
+  internalTrafficPolicy: Local
+---
+
+# Database Pod
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mammoth-db
+  namespace: mammoth-deployment-client-scaling
+  labels:
+    name: mammoth-db
+    namespace: mammoth-deployment-client-scaling
+    type: db-deployment
+spec:
+  containers:
+    - name: mammoth-db
+      image: postgres:13-alpine
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: KCMS_KUBE_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: KCMS_KUBE_POD_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: KCMS_KUBE_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-pass
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-db
+        - name: PGDATA
+          value: "/srv/postgres/data"
+      volumeMounts:
+        - mountPath: "/srv/postgres/data"
+          name: mammoth-database-data
+  volumes:
+    - name: mammoth-database-data
+      persistentVolumeClaim:
+        claimName: mammoth-database
+---

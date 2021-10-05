@@ -1,0 +1,76 @@
+# This file SHOULD NEVER be used in a production environment, as it contains tools that could be publicly accessed.
+# These tools are intended for use when debugging problems within this cluster, or for development views into the
+# Components for this cluster, such as DNS tooling, DB admin tooling or even maybe custom tools in the future
+
+# DNS resolution helper (Must be attached to or have a new shell opened on to interact)
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debugging-dnsutils
+  namespace: mammoth-deployment-client-scaling
+spec:
+  containers:
+    - name: dnsutils
+      image: gcr.io/kubernetes-e2e-test-images/dnsutils:1.3
+      command:
+        - sleep
+        - "3600"
+      imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+---
+
+# Adminer (DB Tooling)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debugging-adminer-pod
+  namespace: mammoth-deployment-client-scaling
+spec:
+  selector:
+    matchLabels:
+      app: debugging-adminer-pod
+  template:
+    metadata:
+      labels:
+        app: debugging-adminer-pod
+        namespace: mammoth-deployment-client-scaling
+    spec:
+      containers:
+      - name: adminer
+        image: adminer:4
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-db
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-connection-info
+              key: pgsql-pass
+        ports:
+        - name: http
+          containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: debugging-adminer
+  namespace: mammoth-deployment-client-scaling
+spec:
+  selector:
+    app: debugging-adminer-pod
+    namespace: mammoth-deployment-client-scaling
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---

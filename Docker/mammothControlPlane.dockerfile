@@ -52,7 +52,7 @@ COPY --from=builder /tmp/libpqxx-6.4.7/libpqxx.so /usr/lib/libpqxx-6.4.so
 USER nobody
 
 EXPOSE 5555
-EXPOSE 5556
+EXPOSE 5554
 
 # We don't need to run anything fancy here, so in preparation for a barebones image, just terminate the container if the process dies
 CMD /srv/mammoth-server/resolveEnvironmentAndRunControlPlane.sh
