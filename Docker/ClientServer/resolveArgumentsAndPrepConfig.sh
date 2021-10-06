@@ -6,16 +6,19 @@
 #
 # @return string maybe resolved environment variable
 maybe_resolve_env_from_env () {
-  case "$1" in
+  RESOLVED_ENVIRONMENT_VALUE=$(printenv -- "$1")
+
+  case "${RESOLVED_ENVIRONMENT_VALUE}" in
       # Check for a sub resolution
       "__RESOLVE::"*)
-        SUB=$(echo "$1" | sed -e "s/__RESOLVE:://g")
+        SUB=$(echo "${RESOLVED_ENVIRONMENT_VALUE}" | sed -e "s/__RESOLVE:://g")
+
         # Time to recur in!
         maybe_resolve_env_from_env "${SUB}" ;;
 
       # DEFAULT: Just return the environment variable if it matched nothing above
       *)
-        printenv -- "$1" ;;
+        echo "${RESOLVED_ENVIRONMENT_VALUE}" ;;
     esac
 }
 

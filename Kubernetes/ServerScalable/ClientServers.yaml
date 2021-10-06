@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mammoth-client-server-plugins
+  name: mammoth-client-server
   namespace: mammoth-deployment-client-scaling
 spec:
   accessModes:
@@ -111,10 +111,10 @@ spec:
                 cpu: 1000m
                 memory: 512M
             volumeMounts:
-              -   mountPath: /srv/minecraft/plugins
-                  name: client-server-plugins
+              -   mountPath: /srv/minecraft
+                  name: client-server
       volumes:
-        -   name: client-server-plugins
+        -   name: client-server
             persistentVolumeClaim:
-              claimName: mammoth-client-server-plugins
+              claimName: mammoth-client-server
 ---
