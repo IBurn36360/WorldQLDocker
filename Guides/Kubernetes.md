@@ -15,7 +15,7 @@ WorldQLDocker/# docker build -f mammothControlPlane.dockerfile -t worldql-contro
 ``` bash
 WorldQLDocker/# docker build -f mammothClientServer.dockerfile -t worldql-client-server:local .
 ```
-OR (If you are running a locally built plugin, at which case you need to follow the preparation steps located [Here](./DockerManual.md))
+OR (If you are running a locally built plugin, at which case you need to follow the preparation steps located [Here](./DockerComposeManual.md))
 ``` bash
 WorldQLDocker/# docker build -f mammothClientServer_Manual.dockerfile -t worldql-client-server:local .
 ```

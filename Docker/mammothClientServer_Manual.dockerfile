@@ -38,4 +38,3 @@ EXPOSE 25565
 
 # Alright, now that we have everything done, the start command is to just run the server
 CMD /srv/mammoth/resolveArgumentsAndPrepConfig.sh && java -Xms${JAVA_MEMORY_MIN} -Xmx${JAVA_MEMORY_MAX} ${JAVA_ARGS} -jar paper.jar nogui
-

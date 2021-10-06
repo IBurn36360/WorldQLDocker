@@ -21,6 +21,6 @@ __All use cases described below assume you have cloned this repository and are i
 
 Links to dedicated guides (All shell code blocks will state what directory you should be in on each command line):
  - [Standalone Control Plane with DB](./Guides/Standalone.md)
- - [Docker (Using the public release)](./Guides/Docker.md)
- - [Docker (Using a locally built plugin)](./Guides/DockerManual.md)
+ - [Docker Compose (Using the public release)](./Guides/DockerCompose.md)
+ - [Docker Compose (Using a locally built plugin)](./Guides/DockerComposeManual.md)
  - [Kubernetes Stack](./Guides/Kubernetes.md)
