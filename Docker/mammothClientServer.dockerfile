@@ -1,7 +1,7 @@
 FROM openjdk:16.0.2-slim
 
 LABEL Maintainer="The WorldQL Team"
-LABEL Description="A plain client sever image for Mammoth"
+LABEL Description="A client sever image for Mammoth"
 
 # Set up the base Java values
 ENV JAVA_MEMORY_MIN="128M"
@@ -11,23 +11,8 @@ ENV JAVA_ARGS=""
 RUN apt update
 RUN apt install -y wget
 
-# Time to build/download the client server and install the Mamoth plugin from the release
-WORKDIR /srv/minecraft
-
-RUN wget -O paper.jar "https://papermc.io/api/v2/projects/paper/versions/1.17.1/builds/281/downloads/paper-1.17.1-281.jar"
-
-# To actually run, we need a eula.txt and we need to download and install mammoth
-RUN echo "eula=true" > eula.txt
-RUN mkdir -pv ./plugins
-
-# Copy in our config generating script and execute it
-RUN mkdir -pv /srv/minecraft/plugins/WorldQLClient
-RUN mkdir -pv /srv/mammoth/
-RUN touch /srv/mammoth/config.yml
-
-# Fetch the manual distro and the config/prep script
-RUN wget -O /srv/mammoth/WorldQLClient.jar https://github.com/WorldQL/mammoth/releases/download/v0.02-alpha/WorldQLClient-1.0-SNAPSHOT.jar
 COPY ./Docker/ClientServer/resolveArgumentsAndPrepConfig.sh /srv/mammoth/resolveArgumentsAndPrepConfig.sh
+COPY ./Docker/ClientServer/plugins /srv/mammoth/plugins
 
 RUN chmod +x /srv/mammoth/resolveArgumentsAndPrepConfig.sh
 

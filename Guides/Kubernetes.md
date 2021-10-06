@@ -12,12 +12,9 @@ WorldQLDocker/# docker build -f mammothControlPlane.dockerfile -t worldql-contro
 ```
 
 #### Client Server Image
+If you are providing a set of plugins, __MAKE SURE YOU PUT THEM INTO THE `plugins` DIRECTORY BEFORE BUILDING!__
 ``` bash
 WorldQLDocker/# docker build -f mammothClientServer.dockerfile -t worldql-client-server:local .
-```
-OR (If you are running a locally built plugin, at which case you need to follow the preparation steps located [Here](./DockerComposeManual.md))
-``` bash
-WorldQLDocker/# docker build -f mammothClientServer_Manual.dockerfile -t worldql-client-server:local .
 ```
 
 ### Setting up and running the cluster
