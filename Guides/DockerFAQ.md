@@ -7,10 +7,3 @@ Dropping the whole composed stack and rebuilding it is generally the simplest wa
 WorldQLDocker/# docker-compose -f ./docker-compose.yml down -d
 WorldQLDocker/# docker-compose -f ./docker-compose.yml up -d
 ```
-
-OR 
-
-```bash
-WorldQLDocker/# docker-compose -f ./docker-compose-manual.yml down -d
-WorldQLDocker/# docker-compose -f ./docker-compose-manual.yml up -d
-```

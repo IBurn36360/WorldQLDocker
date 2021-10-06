@@ -38,7 +38,7 @@ if [ ! -f /srv/minecraft/eula.txt ]; then
 fi
 
 # Alright check for, and maybe symlink the plugins folder to our local one
-if [ ! -f /srv/minecraft/plugins ]; then
+if [ ! -L /srv/minecraft/plugins ]; then
   echo "Creating symlink to local minecraft plugins location"
 
   ln -s /srv/mammoth/plugins /srv/minecraft/plugins
@@ -46,19 +46,19 @@ fi
 
 # And make sure we make a symlink for the worlds to a local disc world.  Mammoth servers can run in isolation, so their worlds sync through the plugin
 # TODO: We should probably take a look at the best way to resolve these ahead of time, or pull them into the default world folder instead of possible to make things a bit more tolerant of newly added dimensions if that is applicable here
-if [ ! -f /srv/minecraft/world ]; then
+if [ ! -L /srv/minecraft/world ]; then
   echo "Creating symlink to local minecraft base world location"
 
   ln -s /srv/mammoth/world /srv/minecraft/world
 fi
 
-if [ ! -f /srv/minecraft/world_nether ]; then
+if [ ! -L /srv/minecraft/world_nether ]; then
   echo "Creating symlink to local minecraft nether world location"
 
   ln -s /srv/mammoth/world_nether /srv/minecraft/world_nether
 fi
 
-if [ ! -f /srv/minecraft/world_the_end ]; then
+if [ ! -L /srv/minecraft/world_the_end ]; then
   echo "Creating symlink to local minecraft end world location"
 
   ln -s /srv/mammoth/world_the_end /srv/minecraft/world_the_end
